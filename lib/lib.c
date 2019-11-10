@@ -19,7 +19,7 @@ base64_stream_encode_init (struct base64_state *state, int flags)
 {
 	// If any of the codec flags are set, redo choice:
 	if (codec.enc == NULL || flags & 0xFF) {
-		codec_choose(&codec, flags);
+		base64_codec_choose(&codec, flags);
 	}
 	state->eof = 0;
 	state->bytes = 0;
@@ -69,7 +69,7 @@ base64_stream_decode_init (struct base64_state *state, int flags)
 {
 	// If any of the codec flags are set, redo choice:
 	if (codec.dec == NULL || flags & 0xFF) {
-		codec_choose(&codec, flags);
+		base64_codec_choose(&codec, flags);
 	}
 	state->eof = 0;
 	state->bytes = 0;

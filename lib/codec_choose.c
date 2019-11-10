@@ -262,7 +262,7 @@ codec_choose_x86 (struct codec *codec)
 }
 
 void
-codec_choose (struct codec *codec, int flags)
+base64_codec_choose (struct codec *codec, int flags)
 {
 	// User forced a codec:
 	if (codec_choose_forced(codec, flags)) {

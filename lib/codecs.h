@@ -62,4 +62,4 @@ struct codec
 	int  (* dec) BASE64_DEC_PARAMS;
 };
 
-extern void codec_choose (struct codec *, int flags);
+extern void base64_codec_choose (struct codec *, int flags);
