@@ -59,6 +59,21 @@ delta_lookup (const uint8x16_t v)
 }
 
 static inline uint8x16_t
+lut_hi_lookup (const uint8x16_t v)
+{
+	const uint8x8_t lut = {
+		0x10, 0x10, 0x01, 0x02, 0x04, 0x08, 0x04, 0x08,
+	};
+
+	// Out-of-range indices should return 0x10:
+	const uint8x8_t upper = vdup_n_u8(0x10);
+
+	return vcombine_u8(
+		vtbx1_u8(upper, lut, vget_low_u8(v)),
+		vtbx1_u8(upper, lut, vget_high_u8(v)));
+}
+
+static inline uint8x16_t
 dec_loop_neon32_lane (uint8x16_t *lane)
 {
 	// See the SSSE3 decoder for an explanation of the algorithm.
@@ -67,18 +82,13 @@ dec_loop_neon32_lane (uint8x16_t *lane)
 		0x11, 0x11, 0x13, 0x1A, 0x1B, 0x1B, 0x1B, 0x1A
 	};
 
-	const uint8x16_t lut_hi = {
-		0x10, 0x10, 0x01, 0x02, 0x04, 0x08, 0x04, 0x08,
-		0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10
-	};
-
 	const uint8x16_t mask_2F = vdupq_n_u8(0x2F);
 
 	const uint8x16_t hi_nibbles = vshrq_n_u8(*lane, 4);
 	const uint8x16_t lo_nibbles = vshrq_n_u8(vshlq_n_u8(*lane, 4), 4);
 	const uint8x16_t eq_2F      = vceqq_u8(*lane, mask_2F);
 
-	const uint8x16_t hi = vqtbl1q_u8(lut_hi, hi_nibbles);
+	const uint8x16_t hi = lut_hi_lookup(hi_nibbles);
 	const uint8x16_t lo = vqtbl1q_u8(lut_lo, lo_nibbles);
 
 	// Now simply add the delta values to the input:
