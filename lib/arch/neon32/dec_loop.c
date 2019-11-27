@@ -72,11 +72,10 @@ dec_loop_neon32_lane (uint8x16_t *lane)
 		0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10
 	};
 
-	const uint8x16_t mask_0F = vdupq_n_u8(0x0F);
 	const uint8x16_t mask_2F = vdupq_n_u8(0x2F);
 
 	const uint8x16_t hi_nibbles = vshrq_n_u8(*lane, 4);
-	const uint8x16_t lo_nibbles = vandq_u8(*lane, mask_0F);
+	const uint8x16_t lo_nibbles = vshrq_n_u8(vshlq_n_u8(*lane, 4), 4);
 	const uint8x16_t eq_2F      = vceqq_u8(*lane, mask_2F);
 
 	const uint8x16_t hi = vqtbl1q_u8(lut_hi, hi_nibbles);
