@@ -9,6 +9,43 @@ is_nonzero (const uint8x16_t v)
 	return u64 != 0;
 }
 
+static inline uint8x16x3_t
+dec_reshuffle (const uint8x16x4_t in)
+{
+	uint8x16x3_t out;
+#if 1
+	// Allow the compiler to reuse registers:
+	out.val[2] = in.val[3];
+
+	__asm__ (
+		"vshr.u8 %q[o0], %q[i1], #4    \n\t"
+		"vshr.u8 %q[o1], %q[i2], #2    \n\t"
+		"vsli.8  %q[o2], %q[i2], #6    \n\t"
+		"vsli.8  %q[o0], %q[i0], #2    \n\t"
+		"vsli.8  %q[o1], %q[i1], #4    \n\t"
+
+		// Outputs:
+		: [o0] "=&w" (out.val[0]),
+		  [o1] "=&w" (out.val[1]),
+		  [o2] "+w"  (out.val[2])
+
+		// Inputs:
+		: [i0] "w" (in.val[0]),
+		  [i1] "w" (in.val[1]),
+		  [i2] "w" (in.val[2])
+	);
+#else
+	out.val[0] = vshrq_n_u8(in.val[1], 4);
+	out.val[1] = vshrq_n_u8(in.val[2], 2);
+	out.val[2] = in.val[3];
+
+	out.val[0] = vsliq_n_u8(out.val[0], in.val[0], 2);
+	out.val[1] = vsliq_n_u8(out.val[1], in.val[1], 4);
+	out.val[2] = vsliq_n_u8(out.val[2], in.val[2], 6);
+#endif
+	return out;
+}
+
 static inline uint8x16_t
 delta_lookup (const uint8x16_t v)
 {
@@ -68,8 +105,6 @@ dec_loop_neon32 (const uint8_t **s, size_t *slen, uint8_t **o, size_t *olen)
 	*olen += rounds * 48;	// 48 bytes produced per round
 
 	do {
-		uint8x16x3_t dec;
-
 		// Load 64 bytes and deinterleave:
 		uint8x16x4_t str = vld4q_u8(*s);
 
@@ -88,12 +123,10 @@ dec_loop_neon32 (const uint8_t **s, size_t *slen, uint8_t **o, size_t *olen)
 		}
 
 		// Compress four bytes into three:
-		dec.val[0] = vorrq_u8(vshlq_n_u8(str.val[0], 2), vshrq_n_u8(str.val[1], 4));
-		dec.val[1] = vorrq_u8(vshlq_n_u8(str.val[1], 4), vshrq_n_u8(str.val[2], 2));
-		dec.val[2] = vorrq_u8(vshlq_n_u8(str.val[2], 6), str.val[3]);
+		const uint8x16x3_t out = dec_reshuffle(str);
 
 		// Interleave and store decoded result:
-		vst3q_u8(*o, dec);
+		vst3q_u8(*o, out);
 
 		*s += 64;
 		*o += 48;
