@@ -82,13 +82,44 @@ dec_loop_neon32_lane (uint8x16_t *lane)
 		0x11, 0x11, 0x13, 0x1A, 0x1B, 0x1B, 0x1B, 0x1A
 	};
 
+#if 0
+	const uint8x8_t lut_hi = {
+		0x10, 0x10, 0x01, 0x02, 0x04, 0x08, 0x04, 0x08,
+	};
+
+	uint8x16_t hi, eq_2F, lo_nibbles, hi_nibbles;
+
+	__asm__(
+		"vshr.u8 %q[hn], %q[in], #4      \n\t"
+		"vshl.u8 %q[ln], %q[in], #4      \n\t"
+		"vshr.u8 %q[ln], %q[ln], #4      \n\t"
+		"vmov.u8 %q[ef], #0x2F           \n\t"
+		"vceq.i8 %q[ef], %q[ef], %q[in]  \n\t"
+
+		"vmov.u8 %q[hi], #0x10              \n\t"
+		"vtbx.8  %e[hi], { %[lh] }, %e[hn]  \n\t"
+		"vtbx.8  %f[hi], { %[lh] }, %f[hn]  \n\t"
+
+		// Outputs:
+		: [in] "+&w" (*lane),
+		  [hi] "=&w" (hi),
+		  [ln] "=&w" (lo_nibbles),
+		  [hn] "=&w" (hi_nibbles),
+		  [ef] "=&w" (eq_2F)
+
+		// Inputs:
+		: [lh] "w" (lut_hi)
+	);
+
+#else
 	const uint8x16_t mask_2F = vdupq_n_u8(0x2F);
 
 	const uint8x16_t hi_nibbles = vshrq_n_u8(*lane, 4);
 	const uint8x16_t lo_nibbles = vshrq_n_u8(vshlq_n_u8(*lane, 4), 4);
 	const uint8x16_t eq_2F      = vceqq_u8(*lane, mask_2F);
+	const uint8x16_t hi         = lut_hi_lookup(hi_nibbles);
+#endif
 
-	const uint8x16_t hi = lut_hi_lookup(hi_nibbles);
 	const uint8x16_t lo = vqtbl1q_u8(lut_lo, lo_nibbles);
 
 	// Now simply add the delta values to the input:
