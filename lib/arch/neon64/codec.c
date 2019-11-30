@@ -32,7 +32,7 @@ load_64byte_table (const uint8_t *p)
 
 #include "../generic/32/dec_loop.c"
 #include "../generic/64/enc_loop.c"
-#include "dec_loop.c"
+#include "../neon32/dec_loop.c"
 #include "enc_loop.c"
 
 #endif	// BASE64_USE_NEON64
@@ -57,7 +57,7 @@ BASE64_DEC_FUNCTION(neon64)
 {
 #ifdef BASE64_USE_NEON64
 	#include "../generic/dec_head.c"
-	dec_loop_neon64(&s, &slen, &o, &olen);
+	dec_loop_neon32(&s, &slen, &o, &olen);
 	dec_loop_generic_32(&s, &slen, &o, &olen);
 	#include "../generic/dec_tail.c"
 #else

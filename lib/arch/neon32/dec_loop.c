@@ -13,7 +13,7 @@ static inline uint8x16x3_t
 dec_reshuffle (const uint8x16x4_t in)
 {
 	uint8x16x3_t out;
-#if 1
+#if 0
 	// Allow the compiler to reuse registers:
 	out.val[2] = in.val[3];
 
