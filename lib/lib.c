@@ -14,7 +14,7 @@
 // The idea being that CPU features don't change at runtime.
 static struct codec codec = { NULL, NULL };
 
-void
+BASE64_EXPORT void
 base64_stream_encode_init (struct base64_state *state, int flags)
 {
 	// If any of the codec flags are set, redo choice:
@@ -27,7 +27,7 @@ base64_stream_encode_init (struct base64_state *state, int flags)
 	state->flags = flags;
 }
 
-void
+BASE64_EXPORT void
 base64_stream_encode
 	( struct base64_state	*state
 	, const char		*src
@@ -39,7 +39,7 @@ base64_stream_encode
 	codec.enc(state, src, srclen, out, outlen);
 }
 
-void
+BASE64_EXPORT void
 base64_stream_encode_final
 	( struct base64_state	*state
 	, char			*out
@@ -64,7 +64,7 @@ base64_stream_encode_final
 	*outlen = 0;
 }
 
-void
+BASE64_EXPORT void
 base64_stream_decode_init (struct base64_state *state, int flags)
 {
 	// If any of the codec flags are set, redo choice:
@@ -77,7 +77,7 @@ base64_stream_decode_init (struct base64_state *state, int flags)
 	state->flags = flags;
 }
 
-int
+BASE64_EXPORT int
 base64_stream_decode
 	( struct base64_state	*state
 	, const char		*src
@@ -99,7 +99,7 @@ base64_stream_decode
 	#include "lib_openmp.c"
 #endif
 
-void
+BASE64_EXPORT void
 base64_encode
 	( const char	*src
 	, size_t	 srclen
@@ -132,7 +132,7 @@ base64_encode
 	*outlen = s + t;
 }
 
-int
+BASE64_EXPORT int
 base64_decode
 	( const char	*src
 	, size_t	 srclen
