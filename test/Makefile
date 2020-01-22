@@ -17,10 +17,10 @@ test: clean test_base64 benchmark
 	./test_base64
 	./benchmark
 
-test_base64: test_base64.c codec_supported.o ../lib/libbase64.o
+test_base64: test_base64.c codec_supported.o ../lib/libbase64.a
 	$(CC) $(CFLAGS) -o $@ $^
 
-benchmark: benchmark.c codec_supported.o ../lib/libbase64.o
+benchmark: benchmark.c codec_supported.o ../lib/libbase64.a
 	$(CC) $(CFLAGS) -o $@ $^ $(BENCH_LDFLAGS)
 
 ../%:

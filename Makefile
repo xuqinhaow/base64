@@ -55,13 +55,13 @@ endif
 
 .PHONY: all analyze clean
 
-all: bin/base64 lib/libbase64.o
+all: bin/base64 lib/libbase64.a
 
-bin/base64: bin/base64.o lib/libbase64.o
+bin/base64: bin/base64.o lib/libbase64.a
 	$(CC) $(CFLAGS) -o $@ $^
 
-lib/libbase64.o: $(OBJS)
-	$(LD) -r -o $@ $^
+lib/libbase64.a: $(OBJS)
+	$(AR) cr $@ $^
 
 lib/config.h:
 	@echo "#define HAVE_AVX2   $(HAVE_AVX2)"    > $@
@@ -89,4 +89,4 @@ analyze: clean
 	scan-build --use-analyzer=`which clang` --status-bugs make
 
 clean:
-	rm -f bin/base64 bin/base64.o lib/libbase64.o lib/config.h $(OBJS)
+	rm -f bin/base64 bin/base64.o lib/libbase64.a lib/config.h $(OBJS)
