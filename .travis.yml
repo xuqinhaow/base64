@@ -2,10 +2,6 @@ language: c
 services: docker
 
 jobs:
-  allow_failures:
-    - os: osx
-    - arch: ppc64le
-
   include:
     - name: linux-amd64-gcc
       os: linux
@@ -68,4 +64,4 @@ jobs:
       os: osx
       arch: amd64
       compiler: clang
-      script: test/ci/amd64.sh
+      script: test/ci/osx.sh
