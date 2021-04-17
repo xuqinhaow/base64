@@ -59,6 +59,9 @@ all: bin/base64 lib/libbase64.o
 bin/base64: bin/base64.o lib/libbase64.o
 	$(CC) $(CFLAGS) -o $@ $^
 
+lib/libbase64.a: lib/libbase64.o
+	$(AR) -crv $@ $^
+
 lib/libbase64.o: $(OBJS)
 	$(LD) -r -o $@ $^
 	$(OBJCOPY) --keep-global-symbols=lib/exports.txt $@
