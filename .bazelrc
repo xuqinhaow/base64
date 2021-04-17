@@ -1,0 +1,13 @@
+build --cxxopt="--std=c++17"
+build --copt=-O0
+build --copt=-g
+build --incompatible_no_support_tools_in_action_inputs=false
+build --copt="-D__FEED_PROTO_POSTFIX__=\"ws_feed_detail_policy_generated.h\""
+build --copt="-D__STDC_FORMAT_MACROS"
+#build --copt="-faligned-new"
+build --strip=never
+#build --define=with_glog=true
+build --jobs=8
+#build --define=client_channel=trpc
+build --incompatible_disable_deprecated_attr_params=false
+build --incompatible_new_actions_api=false

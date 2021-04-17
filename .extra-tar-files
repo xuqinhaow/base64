@@ -1,0 +1,3 @@
+bazel-bin/phase_script.h
+bazel-bin/fsagent
+bazel-bin/filebeat
